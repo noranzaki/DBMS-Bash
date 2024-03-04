@@ -10,16 +10,13 @@ list_databases() {
         exit 1
     else
         echo "Available databases:"
-        for db in "${DataBase[@]}"
-        do
-            echo "${db%/}"  # Remove trailing slash
-        done
     fi
 }
 
 # Function to perform actions within a selected database
 perform_actions() {
     database=$1
+    cd ./$database
     PS3="Select action: "
     actions=("Create table" "Insert data in table" "Drop data in table" "Select from table" "Delete from table" "Update" "List" "Exit")
     select action in "${actions[@]}"
@@ -45,16 +42,23 @@ main() {
     PS3="Select database: " #da prompt lel select 
     DataBase=($(ls -F | grep / | sed 's|[/]||g'))  # Remove trailing slash from each directory name sed 's|[/]||g': Uses sed to remove the trailing slashes from each directory name. The s|[/]||g command replaces each occurrence of the slash / with nothing (| is used as a delimiter, and g means global replacement).
     
-    select db_name in "${DataBase[@]}"
+    select db_name in "${DataBase[@]}" "Main Menu"
      do
-        if [ -n "$db_name" ] #Checks if a valid option has been selected (if $db_name is not empty).
-        then
-            echo "Connected to database: $db_name"
-            perform_actions "$db_name"
-            break
-        else
-            echo "Invalid option"
-        fi
+        case $db_name in
+            "Main Menu")
+                cd ..
+                ./main.sh
+                ;;
+            *)
+                 if [ -n "$db_name" ] #Checks if a valid option has been selected (if $db_name is not empty).
+                    then
+                        echo "Connected to database: $db_name"
+                        perform_actions "$db_name"
+                          break
+                 else
+                     echo "Invalid option"
+                 fi
+        esac
     done
 }
 
