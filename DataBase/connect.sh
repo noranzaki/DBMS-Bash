@@ -17,19 +17,25 @@ list_databases() {
 perform_actions() {
     database=$1
     cd ./$database
-    PS3="Select action: "
+
     actions=("Create table" "Insert data in table" "Drop data in table" "Select from table" "Delete from table" "Update" "List" "Exit")
     select action in "${actions[@]}"
     do
         case $REPLY in
-            1) echo "You selected: Create table";;
+            1) 
+                db=$database
+                export db
+                 cd .. 
+                . ./createtable.sh; break;;  
+
             2) echo "You selected: Insert data in table";;
             3) echo "You selected: Drop data in table";;
             4) echo "You selected: Select from table";;
             5) echo "You selected: Delete from table";;
             6) echo "You selected: Update";;
             7) echo "You selected: List";;
-            8) echo "Exiting..."; break;;
+            8) 
+                cd ../.. ;  ./main.sh break;;
             *) echo "Invalid option";;
         esac
     done
@@ -38,8 +44,6 @@ perform_actions() {
 # Main function
 main() {
     list_databases
-    
-    PS3="Select database: " #da prompt lel select 
     DataBase=($(ls -F | grep / | sed 's|[/]||g'))  # Remove trailing slash from each directory name sed 's|[/]||g': Uses sed to remove the trailing slashes from each directory name. The s|[/]||g command replaces each occurrence of the slash / with nothing (| is used as a delimiter, and g means global replacement).
     
     select db_name in "${DataBase[@]}" "Main Menu"

@@ -12,8 +12,8 @@ do
   case $REPLY in
     1) echo "Create";;
     2) echo "List";;
-    3) source ./dropdb.sh ;;
-    4) source ./connect.sh ;;
+    3) ./dropdb.sh break;;
+    4) ./connect.sh ; break;;
     5) echo "Bye..."; break;;
     *) echo "Invalid option";;
   esac

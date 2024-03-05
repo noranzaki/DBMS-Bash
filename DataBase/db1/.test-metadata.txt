@@ -1,0 +1,3 @@
+id:int:PK=true:NULL=no
+name:varchar:PK=false:NULL=no
+address:varchar:PK=false:NULL=yes
