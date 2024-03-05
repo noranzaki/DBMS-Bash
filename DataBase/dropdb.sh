@@ -1,18 +1,5 @@
 #!/bin/bash
 
-# Function to list available databases
-list_databases() {
-    DataBase=($(ls -F | grep / )) #to get directories onlyy 
-    if [ ${#DataBase[@]} -eq 0 ] #length of array 
-    then
-        echo "No databases found."
-        exit 1
-    else
-        echo "Available databases:"
-    fi
-}
-
-
 # Function to drop a database
 drop_database() {
      list_databases

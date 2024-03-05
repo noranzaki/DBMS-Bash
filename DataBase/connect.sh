@@ -15,18 +15,6 @@ list_tables() {
 export -f list_tables
 
 
-# Function to list available databases
-list_databases() {
-    DataBase=($(ls -F | grep / )) #to get directories onlyy 
-    if [ ${#DataBase[@]} -eq 0 ]
-    then
-        echo "No databases found."
-        exit 1
-    else
-        echo "Available databases:"
-    fi
-}
-
 # Function to perform actions within a selected database
 perform_actions() {
     database=$1
