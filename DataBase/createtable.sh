@@ -3,17 +3,17 @@
 cd ./$db 
 shopt -s extglob
 # Function to list available tables in the current database
-list_tables() {
-    echo "Available tables in '$1':"
-    tables=($(ls -F  | grep '.txt'))
-    if [ ${#tables[@]} -eq 0 ]; then
-        echo "No tables found in '$1'."
-    else
-        for table in "${tables[@]}"; do
-            echo "${table%'.txt'}"  # Remove trailing slash
-        done
-    fi
-}
+# list_tables() {
+#     echo "Available tables in '$1':"
+#     tables=($(ls -F  | grep '.txt'))
+#     if [ ${#tables[@]} -eq 0 ]; then
+#         echo "No tables found in '$1'."
+#     else
+#         for table in "${tables[@]}"; do
+#             echo "${table%'.txt'}"  # Remove trailing slash
+#         done
+#     fi
+# }
 
 insert_metadata() {
     local db_name="$1"

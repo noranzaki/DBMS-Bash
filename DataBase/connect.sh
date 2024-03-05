@@ -1,6 +1,20 @@
 #!/bin/bash
 echo "Testt nb2a nshelhaa lma nkhls.."
 
+list_tables() {
+    echo "Available tables in '$1':"
+    tables=($(ls -F  | grep '.txt'))
+    if [ ${#tables[@]} -eq 0 ]; then
+        echo "No tables found in '$1'."
+    else
+        for table in "${tables[@]}"; do
+            echo "${table%'.txt'}"  # Remove trailing slash
+        done
+    fi
+}
+export -f list_tables
+
+
 # Function to list available databases
 list_databases() {
     DataBase=($(ls -F | grep / )) #to get directories onlyy 
@@ -33,9 +47,12 @@ perform_actions() {
             4) echo "You selected: Select from table";;
             5) echo "You selected: Delete from table";;
             6) echo "You selected: Update";;
-            7) echo "You selected: List";;
+            7)  db=$database
+                export db
+                 cd .. 
+                . ./listtable.sh; break;;
             8) 
-                cd ../.. ;  ./main.sh break;;
+                cd ../.. ;  ./main.sh ; break;;
             *) echo "Invalid option";;
         esac
     done
