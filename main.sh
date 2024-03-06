@@ -1,8 +1,11 @@
 #!/bin/bash
 # Function to list available databases
-list_databases() {
-    DataBase=($(ls -F | grep / )) #to get directories onlyy 
-    if [ ${#DataBase[@]} -eq 0 ] #length of array 
+pwd
+
+list_databases() 
+{
+    Databases=($(ls -F ./Databases | grep / )) #to get directories onlyy 
+    if [ ${#Databases[@]} -eq 0 ] #length of array 
     then
         echo "No databases found."
         exit 1
@@ -11,21 +14,22 @@ list_databases() {
     fi
 }
 export -f list_databases
-
-if ! [[ -d ./DataBase ]]
+if  [[ ! -d ./Databases ]]
 then
-  mkdir ./DataBase
+  mkdir ./Databases
 fi
-
-cd ./DataBase || exit 1
-
-select option in "Create" "List" "Drop" "Connect" "Exit"; 
+#cd Databases || exit 1
+echo "********* Welcome to Bash DBMS *********"
+echo "Main Menu"
+echo "-----------"
+PS3="Enter your option: "
+select option in "Create a new Database" "List all Databses" "Drop a Database" "Connect to a Database" "Exit"; 
 do
   case $REPLY in
-    1) echo "Create";;
-    2) echo "List";;
-    3) ./dropdb.sh break;;
-    4) ./connect.sh ; break;;
+    1) source ./create_db.sh break;;
+    2) source ./list_db.sh break;;
+    3) source ./dropdb.sh break ;;
+    4) source ./connect.sh break;;
     5) echo "Bye..."; break;;
     *) echo "Invalid option";;
   esac

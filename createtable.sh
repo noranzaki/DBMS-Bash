@@ -1,20 +1,8 @@
 #!/bin/bash
 
-cd ./$db 
+cd ./Databases/$db 
 shopt -s extglob
-# Function to list available tables in the current database
-# list_tables() {
-#     echo "Available tables in '$1':"
-#     tables=($(ls -F  | grep '.txt'))
-#     if [ ${#tables[@]} -eq 0 ]; then
-#         echo "No tables found in '$1'."
-#     else
-#         for table in "${tables[@]}"; do
-#             echo "${table%'.txt'}"  # Remove trailing slash
-#         done
-#     fi
-# }
-
+pwd 
 insert_metadata() {
     local db_name="$1"
     local table_name="$2"
@@ -25,12 +13,14 @@ insert_metadata() {
     for ((i = 1; i <= num_columns; i++)); do
         echo "Column $i:"
         read -rp "Enter column name: " column_name
+        
+        # Validate column name
+    while ! [[ "$column_name" =~ ^[a-zA-Z][a-zA-Z0-9_]*$ ]]
+     do
+        echo "Invalid column name. Column name must start with a letter, followed by letters, digits, or underscores."
+        read -rp "Enter column name: " column_name
+    done
 
-        # Check if column name is empty
-        while [[ -z "$column_name" ]]; do
-            echo "Column name cannot be empty."
-            read -rp "Enter column name: " column_name
-        done
 
         read -rp "Enter column type (int/varchar): " column_type
 
@@ -105,10 +95,6 @@ insert_metadata() {
     fi
 }
 
-
-
-
-
 # Function to create a table
 create_table() {
     local db_name="$1"
@@ -165,6 +151,14 @@ create_table() {
         break 
     done
     read -rp "Enter the number of columns: " num_columns
+      # Validate column number
+    # Validate column number
+    while ! [[ "$num_columns" =~ ^[1-9][0-9]*$ ]]
+     do
+        echo "Invalid input. Please enter a valid positive integer."
+        read -rp "Enter the number of columns: " num_columns
+    done
+
     insert_metadata "$db" "$table_name" "$num_columns"
 
 }
@@ -180,3 +174,5 @@ main() {
 
 # Call main function
 main
+cd ../..
+./connect.sh
