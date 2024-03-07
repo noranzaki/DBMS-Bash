@@ -39,8 +39,9 @@ perform_actions() {
                 export db
                 cd ../..
                  source ./listtable.sh; break;;
-            8) cd ../..
-               source ./main.sh ; break;;
+            8) 
+                cd ../..
+               source ./connect.sh ; break;;
             *) echo "Invalid option";;
         esac
     done
@@ -50,12 +51,12 @@ perform_actions() {
 main() {
     list_databases
     DataBase=($(ls -F ./Databases | grep / | sed 's|[/]||g'))  # Remove trailing slash from each directory name sed 's|[/]||g': Uses sed to remove the trailing slashes from each directory name. The s|[/]||g command replaces each occurrence of the slash / with nothing (| is used as a delimiter, and g means global replacement).
-    
+    PS3="Select Database: "
     select db_name in "${DataBase[@]}" "Back to Main Menu"
      do
         case $db_name in
             "Back to Main Menu")
-                ./main.sh
+                source ./main.sh
                 ;;
             *)
                  if [ -n "$db_name" ] #Checks if a valid option has been selected (if $db_name is not empty).
