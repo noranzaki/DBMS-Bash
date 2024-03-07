@@ -48,17 +48,19 @@ insert_metadata() {
         column_types+=("$column_type")
         # Ask if the column is the primary key
         if [ "$primary_key_chosen" = false ]; then
-            while true; do
-                read -rp "Is this column the primary key? (yes/no): " is_primary_key
-                is_primary_key=$(echo "$is_primary_key" | awk '{print tolower($0)}')
+           while true;
+            do
+                 read -rp "Is this column the primary key? (yes/no): " is_primary_key
 
-                # Validate input
-                if [[ "$is_primary_key" == "yes" || "$is_primary_key" == "no" ]]; then
-                    break
+                 # Validate input
+                if [[ "$is_primary_key" == "yes" || "$is_primary_key" == "no" ]]; 
+                then
+                   break
                 else
-                    echo "Invalid input. Please enter 'yes' or 'no'."
-                fi
+                  echo "Invalid input. Please enter 'yes' or 'no'."
+                 fi
             done
+
 
             if [ "$is_primary_key" = "yes" ]; then
                 primary_key_chosen=true

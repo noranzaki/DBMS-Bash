@@ -11,6 +11,7 @@ list_tables() {
             echo "${table%'.txt'}"  # Remove trailing slash
         done
     fi
+    
 }
 export -f list_tables
 
@@ -19,8 +20,10 @@ export -f list_tables
 perform_actions() {
     database=$1
     cd ./Databases/$database
+    db=$database
+    export db
     PS3="Enter your option for tables: "
-    actions=("Create table" "Insert data in table" "Drop data in table" "Select from table" "Delete from table" "Update" "List" "Exit")
+    actions=("Create table" "Insert data in table" "Drop Table" "Select from table" "Delete from table" "Update" "List" "Exit")
     select action in "${actions[@]}"
     do
         case $REPLY in
@@ -31,12 +34,13 @@ perform_actions() {
                  source ./createtable.sh; break;;  
 
             2) echo "You selected: Insert data in table";;
-            3) echo "You selected: Drop data in table";;
+            3) 
+                 cd ../..
+               source ./drop_table.sh ; break;;
             4) echo "You selected: Select from table";;
             5) echo "You selected: Delete from table";;
             6) echo "You selected: Update";;
-            7) db=$database
-                export db
+            7) 
                 cd ../..
                  source ./listtable.sh; break;;
             8) 
