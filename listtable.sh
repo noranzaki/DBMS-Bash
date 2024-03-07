@@ -4,4 +4,7 @@ db_name=$(basename "$(pwd)")  # Get the name of the current directory as the dat
 
 list_tables "$db_name"
 cd ../.. 
-./connect.sh
+echo "------------------------------"
+echo "Back to Table Menu.."
+echo "------------------------------"
+perform_actions $db

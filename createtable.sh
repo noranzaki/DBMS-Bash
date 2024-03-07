@@ -175,4 +175,8 @@ main() {
 # Call main function
 main
 cd ../..
-./connect.sh
+# ./connect.sh
+echo "------------------------------"
+echo "Back to Table Menu.."
+echo "------------------------------"
+perform_actions $db

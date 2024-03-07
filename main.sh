@@ -1,6 +1,6 @@
 #!/bin/bash
 # Function to list available databases
-pwd
+
 
 list_databases() 
 {
@@ -8,7 +8,8 @@ list_databases()
     if [ ${#Databases[@]} -eq 0 ] #length of array 
     then
         echo "No databases found."
-        exit 1
+        ./main.sh
+        #exit 1
     else
         echo "Available databases:"
     fi
@@ -30,7 +31,7 @@ do
     2) source ./list_db.sh break;;
     3) source ./dropdb.sh break ;;
     4) source ./connect.sh break;;
-    5) echo "Bye..."; break;;
+    5) echo "Bye..."; exit 1;;
     *) echo "Invalid option";;
   esac
 done

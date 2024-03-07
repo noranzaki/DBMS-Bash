@@ -35,12 +35,12 @@ perform_actions() {
             4) echo "You selected: Select from table";;
             5) echo "You selected: Delete from table";;
             6) echo "You selected: Update";;
-            7)  db=$database
+            7) db=$database
                 export db
                 cd ../..
                  source ./listtable.sh; break;;
             8) cd ../..
-                source ./main.sh ; break;;
+               source ./main.sh ; break;;
             *) echo "Invalid option";;
         esac
     done
@@ -51,10 +51,10 @@ main() {
     list_databases
     DataBase=($(ls -F ./Databases | grep / | sed 's|[/]||g'))  # Remove trailing slash from each directory name sed 's|[/]||g': Uses sed to remove the trailing slashes from each directory name. The s|[/]||g command replaces each occurrence of the slash / with nothing (| is used as a delimiter, and g means global replacement).
     
-    select db_name in "${DataBase[@]}" "Main Menu"
+    select db_name in "${DataBase[@]}" "Back to Main Menu"
      do
         case $db_name in
-            "Main Menu")
+            "Back to Main Menu")
                 ./main.sh
                 ;;
             *)
