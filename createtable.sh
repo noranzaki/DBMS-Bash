@@ -43,10 +43,9 @@ insert_metadata() {
         while [[ "$column_type" != "int" && "$column_type" != "varchar" ]]; do
             echo "Invalid column type. Please enter 'int' or 'varchar'."
             read -rp "Enter column type (int/varchar): " column_type
+            
         done
-
         column_types+=("$column_type")
-
         # Ask if the column is the primary key
         if [ "$primary_key_chosen" = false ]; then
             while true; do
@@ -63,30 +62,47 @@ insert_metadata() {
 
             if [ "$is_primary_key" = "yes" ]; then
                 primary_key_chosen=true
-                is_nullable="no"  # Ensure primary key cannot be null
+                pk="pk"
+                nullable="notNull"  # Ensure primary key cannot be null
             else
+                pk=""
                 read -rp "Is this column nullable? (yes/no): " is_nullable
+                if [ "$is_nullable" = "yes" ]; then
+                    nullable="null"
+                else
+                    nullable="notNull"
+                fi
             fi
         else
             is_primary_key="no"
             read -rp "Is this column nullable? (yes/no): " is_nullable
+            if [ "$is_nullable" = "yes" ]; then
+                nullable="null"
+            else
+                nullable="notNull"
+            fi
         fi
 
         # Validate the input
         while [[ "$is_nullable" != "yes" && "$is_nullable" != "no" ]]; do
             echo "Invalid input. Please enter 'yes' or 'no'."
             read -rp "Is this column nullable? (yes/no): " is_nullable
+            if [ "$is_nullable" = "yes" ]; then
+                nullable="null"
+            else
+                nullable="notNull"
+            fi
         done
 
         # Append metadata line to the array
-        metadata_lines+=("$column_name:$column_type:$is_primary_key:$is_nullable")
+        metadata_lines+=("$column_name:$column_type:$pk:$nullable")
         
         # Display gathered metadata
         echo "-----------------------------------"
         echo "Column name: $column_name"
         echo "Column type: $column_type"
-        echo "Primary key: $is_primary_key"
-        echo "Nullable: $is_nullable"
+        echo "Primary key: $pk"
+        echo "Nullable: $nullable"
         echo "-----------------------------------"
     done
 
@@ -116,22 +132,25 @@ insert_metadata() {
 
             # Ensure the chosen column is not nullable
             chosen_col_name="${column_names[primary_key_column - 1]}"
-            is_nullable="no"  # Ensure primary key cannot be null
-            is_primary_key="yes"
+            chosen_col_type="${column_types[primary_key_column - 1]}"
+            nullable="notNull"  # Ensure primary key cannot be null
+            pk="pk"
 
             # Update metadata line for the chosen column
-            metadata_lines[$((primary_key_column - 1))]="${chosen_col_name}:${column_types[$((primary_key_column - 1))]}:$is_primary_key:$is_nullable"
+            metadata_lines[$((primary_key_column - 1))]="${chosen_col_name}:${chosen_col_type}:$pk:$nullable"
 
             # Exit the loop
             break
         done
     fi
 
-    # Combine metadata lines into a single string
-    metadata=$(IFS=$'\n'; echo "${metadata_lines[*]}")
+    # Build metadata string
+    for line in "${metadata_lines[@]}"; do
+        metadata+="$line"$'\n'
+    done
 
     # Save metadata into metadata file
-    echo -ne "$metadata" >".$table_name-metadata.txt"
+    echo -n "$metadata" > ".$table_name-metadata.txt"
 
     # Display gathered metadata
     echo "Metadata saved for table '$table_name'."
@@ -139,6 +158,7 @@ insert_metadata() {
     chmod +x "$table_name.txt"  ".$table_name-metadata.txt"
     echo "Table '$table_name' created successfully in '$db_name'."
 }
+
 
 
 
