@@ -1,0 +1,2 @@
+id:int:yes:no
+name:varchar:no:no

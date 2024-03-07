@@ -15,6 +15,6 @@ while true; do
         echo "Error: Enter a database name that starts with a character and contains no special characters or spaces."
     fi
 done
-./main.sh
+source ./main.sh
 
 

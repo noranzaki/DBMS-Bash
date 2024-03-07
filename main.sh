@@ -8,7 +8,7 @@ list_databases()
     if [ ${#Databases[@]} -eq 0 ] #length of array 
     then
         echo "No databases found."
-        ./main.sh
+        source ./main.sh
         #exit 1
     else
         echo "Available databases:"

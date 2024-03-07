@@ -2,25 +2,40 @@
 
 cd ./Databases/$db 
 shopt -s extglob
-pwd 
+
+# Function to insert metadata for a table
 insert_metadata() {
     local db_name="$1"
     local table_name="$2"
     local num_columns="$3"
     local primary_key_chosen=false
+    local metadata=""
+    declare -a column_names  # Array to store column names
+    declare -a column_types  # Array to store column types
+    declare -a metadata_lines  # Array to store metadata lines for each column
 
     # Loop to gather metadata for each column
     for ((i = 1; i <= num_columns; i++)); do
         echo "Column $i:"
-        read -rp "Enter column name: " column_name
-        
-        # Validate column name
-    while ! [[ "$column_name" =~ ^[a-zA-Z][a-zA-Z0-9_]*$ ]]
-     do
-        echo "Invalid column name. Column name must start with a letter, followed by letters, digits, or underscores."
-        read -rp "Enter column name: " column_name
-    done
+        local column_name
+        while true; do
+            read -rp "Enter column name: " column_name
 
+            # Validate column name
+            while ! [[ "$column_name" =~ ^[a-zA-Z][a-zA-Z0-9_]*$ ]]; do
+                echo "Invalid column name. Column name must start with a letter, followed by letters, digits, or underscores."
+                read -rp "Enter column name: " column_name
+            done
+
+            # Check if column name already exists in column_names array
+            if [[ " ${column_names[@]} " =~ " $column_name " ]]; then
+                echo "Column '$column_name' already exists. Please enter a different name."
+                continue
+            else
+                column_names+=("$column_name")
+                break
+            fi
+        done
 
         read -rp "Enter column type (int/varchar): " column_type
 
@@ -30,8 +45,32 @@ insert_metadata() {
             read -rp "Enter column type (int/varchar): " column_type
         done
 
-        # Ask if the column is nullable
-        read -rp "Is this column nullable? (yes/no): " is_nullable
+        column_types+=("$column_type")
+
+        # Ask if the column is the primary key
+        if [ "$primary_key_chosen" = false ]; then
+            while true; do
+                read -rp "Is this column the primary key? (yes/no): " is_primary_key
+                is_primary_key=$(echo "$is_primary_key" | awk '{print tolower($0)}')
+
+                # Validate input
+                if [[ "$is_primary_key" == "yes" || "$is_primary_key" == "no" ]]; then
+                    break
+                else
+                    echo "Invalid input. Please enter 'yes' or 'no'."
+                fi
+            done
+
+            if [ "$is_primary_key" = "yes" ]; then
+                primary_key_chosen=true
+                is_nullable="no"  # Ensure primary key cannot be null
+            else
+                read -rp "Is this column nullable? (yes/no): " is_nullable
+            fi
+        else
+            is_primary_key="no"
+            read -rp "Is this column nullable? (yes/no): " is_nullable
+        fi
 
         # Validate the input
         while [[ "$is_nullable" != "yes" && "$is_nullable" != "no" ]]; do
@@ -39,40 +78,28 @@ insert_metadata() {
             read -rp "Is this column nullable? (yes/no): " is_nullable
         done
 
-        # Ask if the column is the primary key (if not chosen yet)
-        if [ "$primary_key_chosen" = false ]; then
-            read -rp "Is this column the primary key? (yes/no): " is_primary_key
-
-            case "$is_primary_key" in
-                [Yy][Ee][Ss])
-                    primary_key_chosen=true
-                    is_primary_key=true
-                    is_nullable=false  # Ensure primary key cannot be null
-                    ;;
-                *)
-                    is_primary_key=false
-                    ;;
-            esac
-        else
-            is_primary_key=false
-        fi
-
-        # Save metadata into metadata file
-        echo "$column_name:$column_type:PK=$is_primary_key:NULL=$is_nullable" >> ".$table_name-metadata.txt"
-
+        # Append metadata line to the array
+        metadata_lines+=("$column_name:$column_type:$is_primary_key:$is_nullable")
+        
         # Display gathered metadata
+        echo "-----------------------------------"
         echo "Column name: $column_name"
         echo "Column type: $column_type"
         echo "Primary key: $is_primary_key"
         echo "Nullable: $is_nullable"
+        echo "-----------------------------------"
     done
 
     # Check if a primary key was chosen
     if [ "$primary_key_chosen" = false ]; then
-        while true; do
-            echo "Available columns:"
-            awk -F ':' '{print NR, $1}' ".$table_name-metadata.txt"
+        # Display available columns to choose from
+        echo "Available columns:"
+        for idx in "${!column_names[@]}"; do
+            echo "$((idx + 1)): ${column_names[idx]}"
+        done
 
+        # Prompt user to choose a primary key column
+        while true; do
             read -rp "Choose a primary key column (Enter column number): " primary_key_column
 
             # Validate the input
@@ -87,21 +114,43 @@ insert_metadata() {
                 continue
             fi
 
-            # Save the primary key status into the metadata file
-            sed -i "${primary_key_column}s/:PK=false/:PK=true/" ".$table_name-metadata.txt"
-            sed -i "${primary_key_column}s/:NULL=yes/:NULL=no/" ".$table_name-metadata.txt"  # Ensure primary key cannot be null
+            # Ensure the chosen column is not nullable
+            chosen_col_name="${column_names[primary_key_column - 1]}"
+            is_nullable="no"  # Ensure primary key cannot be null
+            is_primary_key="yes"
+
+            # Update metadata line for the chosen column
+            metadata_lines[$((primary_key_column - 1))]="${chosen_col_name}:${column_types[$((primary_key_column - 1))]}:$is_primary_key:$is_nullable"
+
+            # Exit the loop
             break
         done
     fi
+
+    # Combine metadata lines into a single string
+    metadata=$(IFS=$'\n'; echo "${metadata_lines[*]}")
+
+    # Save metadata into metadata file
+    echo -ne "$metadata" >".$table_name-metadata.txt"
+
+    # Display gathered metadata
+    echo "Metadata saved for table '$table_name'."
+    touch "$table_name.txt"
+    chmod +x "$table_name.txt"  ".$table_name-metadata.txt"
+    echo "Table '$table_name' created successfully in '$db_name'."
 }
+
+
+
+
 
 # Function to create a table
 create_table() {
     local db_name="$1"
     local table_name
-    
-    while true; 
-    do
+    local num_columns
+
+    while true; do
         # Read table name from user input
         read -rp "Enter table name: " table_name
 
@@ -141,34 +190,25 @@ create_table() {
             continue
         fi
 
-        # Create table file
-        touch "$table_name.txt"
-        touch ".$table_name-metadata.txt"
-        chmod +x "$table_name.txt"  ".$table_name-metadata.txt"
-        echo "Table '$table_name' created successfully in '$db_name'."
-        # cd ..
-        # ./connect.sh
-        break 
-    done
-    read -rp "Enter the number of columns: " num_columns
-      # Validate column number
-    # Validate column number
-    while ! [[ "$num_columns" =~ ^[1-9][0-9]*$ ]]
-     do
-        echo "Invalid input. Please enter a valid positive integer."
+        # Collect metadata
         read -rp "Enter the number of columns: " num_columns
+
+        # Validate column number
+        while ! [[ "$num_columns" =~ ^[1-9][0-9]*$ ]]; do
+            echo "Invalid input. Please enter a valid positive integer."
+            read -rp "Enter the number of columns: " num_columns
+        done
+
+        # Insert metadata for the table
+        insert_metadata "$db_name" "$table_name" "$num_columns"
+        break
     done
-
-    insert_metadata "$db" "$table_name" "$num_columns"
-
 }
 
 # Main function
 main() {
     db_name=$(basename "$(pwd)")  # Get the name of the current directory as the database name
-
     list_tables "$db_name"
-    
     create_table "$db_name"
 }
 

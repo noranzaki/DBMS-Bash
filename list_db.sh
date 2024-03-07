@@ -7,4 +7,4 @@ for Databases in "${Databases[@]}";
 do
     echo "${Databases%'/'}"  # Remove trailing slash
 done
-./main.sh
+source ./main.sh
