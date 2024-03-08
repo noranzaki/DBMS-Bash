@@ -33,9 +33,9 @@ perform_actions() {
                 cd ../..
                  source ./createtable.sh; break;;  
 
-            2) echo "You selected: Insert data in table";;
-            3) 
-                 cd ../..
+            2) cd ../..
+               source insert_into_table.sh; break;;
+            3) cd ../..
                source ./drop_table.sh ; break;;
             4) echo "You selected: Select from table";;
             5) echo "You selected: Delete from table";;
