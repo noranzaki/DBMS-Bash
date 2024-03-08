@@ -67,7 +67,7 @@ insert_metadata() {
                 pk="pk"
                 nullable="notNull"  # Ensure primary key cannot be null
             else
-                pk=""
+                pk="notPk"
                 read -rp "Is this column nullable? (yes/no): " is_nullable
                 if [ "$is_nullable" = "yes" ]; then
                     nullable="null"
