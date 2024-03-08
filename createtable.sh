@@ -15,7 +15,8 @@ insert_metadata() {
     declare -a metadata_lines  # Array to store metadata lines for each column
 
     # Loop to gather metadata for each column
-    for ((i = 1; i <= num_columns; i++)); do
+    for ((i = 1; i <= num_columns; i++)); 
+    do
         echo "Column $i:"
         local column_name
         while true; do
@@ -60,28 +61,31 @@ insert_metadata() {
                 if [[ "$is_primary_key" == "yes" || "$is_primary_key" == "no" ]];
                 then
                     echo ""
+
                     break;
                 else
                     echo "Invalid input. Please enter 'yes' or 'no'."
                 fi
             done
 
-            if [ "$is_primary_key" == "yes" ]; 
+            if [ "$is_primary_key" = "yes" ]; 
             then
                 primary_key_chosen=true
                 pk="pk"
-                nullable="notNull"  # Ensure primary key cannot be null
+                nullable="notNull"
+                is_nullable="no"  # Ensure primary key cannot be null
             else
                 pk="notPk"
                 read -rp "Is this column nullable? (yes/no): " is_nullable
-            if [ "$is_nullable" == "yes" ]; then
-                nullable="null"
-            else
-                nullable="notNull"
-            fi
+                if [ "$is_nullable" = "yes" ]; 
+                then
+                     nullable="null"
+                else
+                    nullable="notNull"
+                fi
             fi
         else
-            is_primary_key="no"
+            pk="notPk"
             read -rp "Is this column nullable? (yes/no): " is_nullable
             if [ "$is_nullable" = "yes" ]; 
             then
@@ -99,7 +103,7 @@ insert_metadata() {
         while [[ "$is_nullable" != "yes" && "$is_nullable" != "no" ]]; do
             echo "Invalid input. Please enter 'yes' or 'no'."
             read -rp "Is this column nullable? (yes/no): " is_nullable
-            if [ "$is_nullable" == "yes" ]; then
+            if [ "$is_nullable" = "yes" ]; then
                 nullable="null"
             else
                 nullable="notNull"
