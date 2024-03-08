@@ -46,50 +46,60 @@ insert_metadata() {
             
         done
         column_types+=("$column_type")
-        # Ask if the column is the primary key
-        if [ "$primary_key_chosen" = false ]; then
-           while true;
-            do
-                 read -rp "Is this column the primary key? (yes/no): " is_primary_key
 
-                 # Validate input
-                if [[ "$is_primary_key" == "yes" || "$is_primary_key" == "no" ]]; 
+
+
+     # Ask if the column is the primary key
+        if [ "$primary_key_chosen" == false ]; 
+        then
+
+            while true;
+            do
+                read -rp "Is this column the primary key? (yes/no): " is_primary_key
+
+                if [[ "$is_primary_key" == "yes" || "$is_primary_key" == "no" ]];
                 then
-                   break
+                    echo ""
+                    break;
                 else
-                  echo "Invalid input. Please enter 'yes' or 'no'."
-                 fi
+                    echo "Invalid input. Please enter 'yes' or 'no'."
+                fi
             done
 
-
-            if [ "$is_primary_key" = "yes" ]; then
+            if [ "$is_primary_key" == "yes" ]; 
+            then
                 primary_key_chosen=true
                 pk="pk"
                 nullable="notNull"  # Ensure primary key cannot be null
             else
-                pk=""
+                pk="notPk"
                 read -rp "Is this column nullable? (yes/no): " is_nullable
-                if [ "$is_nullable" = "yes" ]; then
-                    nullable="null"
-                else
-                    nullable="notNull"
-                fi
+            if [ "$is_nullable" == "yes" ]; then
+                nullable="null"
+            else
+                nullable="notNull"
+            fi
             fi
         else
             is_primary_key="no"
             read -rp "Is this column nullable? (yes/no): " is_nullable
-            if [ "$is_nullable" = "yes" ]; then
+            if [ "$is_nullable" = "yes" ]; 
+            then
                 nullable="null"
             else
                 nullable="notNull"
             fi
         fi
 
+      
+   
+
+
         # Validate the input
         while [[ "$is_nullable" != "yes" && "$is_nullable" != "no" ]]; do
             echo "Invalid input. Please enter 'yes' or 'no'."
             read -rp "Is this column nullable? (yes/no): " is_nullable
-            if [ "$is_nullable" = "yes" ]; then
+            if [ "$is_nullable" == "yes" ]; then
                 nullable="null"
             else
                 nullable="notNull"
