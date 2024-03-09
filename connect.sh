@@ -1,15 +1,9 @@
 #!/bin/bash
-echo "Testt nb2a nshelhaa lma nkhls.."
-pwd
 list_tables() {
     echo "Available tables in '$1':"
     tables=($(ls -F  | grep '.txt'))
     if [ ${#tables[@]} -eq 0 ]; then
         echo "No tables found in '$1'."
-    else
-        for table in "${tables[@]}"; do
-            echo "${table%'.txt'}"  # Remove trailing slash
-        done
     fi
     
 }
@@ -33,19 +27,23 @@ perform_actions() {
                 cd ../..
                  source ./createtable.sh; break;;  
 
-            2) cd ../..
-               source insert_into_table.sh; break;;
-            3) cd ../..
-               source ./drop_table.sh ; break;;
+            2) 
+                cd ../..
+                source insert_into_table.sh; break;;
+            3) 
+                cd ../..
+                source ./drop_table.sh ; break;;
             4) echo "You selected: Select from table";;
             5) echo "You selected: Delete from table";;
-            6) echo "You selected: Update";;
+            6) 
+                cd ../..
+                source update_table.sh; break;;
             7) 
                 cd ../..
-                 source ./listtable.sh; break;;
+                source ./listtable.sh; break;;
             8) 
                 cd ../..
-               source ./connect.sh ; break;;
+                source ./connect.sh ; break;;
             *) echo "Invalid option";;
         esac
     done

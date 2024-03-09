@@ -1,13 +1,11 @@
 #!/bin/bash
 cd ./Databases/$db 
-pwd
-# Function to drop a database
+
 drop_table() {
     db_name=$(basename "$(pwd)")  # Get the name of the current directory as the database name
     list_tables "$db_name"
     tables=($(ls -F | grep '.txt*' | sed 's/\.txt\*$//' | sed 's/\.txt$//'))  # Remove trailing slash from each directory name
     PS3="Choose a Table to drop: "
-    echo "******************************"
     select table_name in "${tables[@]}" "Back to Table Menu"; do
         case $table_name in
             "Back to Table Menu")
