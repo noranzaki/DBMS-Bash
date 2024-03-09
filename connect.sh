@@ -1,6 +1,6 @@
 #!/bin/bash
-echo "Testt nb2a nshelhaa lma nkhls.."
-pwd
+# echo "Testt nb2a nshelhaa lma nkhls.."
+# pwd
 list_tables() {
     echo "Available tables in '$1':"
     tables=($(ls -F  | grep '.txt'))
@@ -35,17 +35,22 @@ perform_actions() {
 
             2) cd ../..
                source insert_into_table.sh; break;;
+
             3) cd ../..
                source ./drop_table.sh ; break;;
-            4) echo "You selected: Select from table";;
+            4) cd ../..
+               source ./select_table.sh ; break;;
+
             5) echo "You selected: Delete from table";;
+
             6) echo "You selected: Update";;
-            7) 
-                cd ../..
-                 source ./listtable.sh; break;;
-            8) 
-                cd ../..
+
+            7) cd ../..
+               source ./listtable.sh; break;;
+
+            8) cd ../..
                source ./connect.sh ; break;;
+
             *) echo "Invalid option";;
         esac
     done
