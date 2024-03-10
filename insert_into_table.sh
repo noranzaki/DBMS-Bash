@@ -39,26 +39,27 @@ insertIntoTable() {
                                         echo "Error: ${field_name} cannot be null."
                                         continue
                                     fi
+                                    if [[ -z "${value}" && "${nullable}" == "null" ]]; then
+                                        value="null"
+                                       
+                                    fi
                                     if [[ "${field_type}" == "int" && ! "${value}" =~ ^[0-9]+$ ]]; then
                                         echo "Error: ${field_name} must be an integer."
                                         continue
-                                    elif [[ "${field_type}" == "varchar" && ! "${value}" =~ ^[a-zA-Z0-9[:space:]_.@-]+$ && "${nullable}" == "notNull" ]]; then
+                                    elif [[ "${field_type}" == "varchar" && ! "${value}" =~ ^[a-zA-Z0-9[:space:]_.@-]+$  ]]; then
                                         echo "Error: ${field_name} must be a string and does not contain special characters except ., @, _ and -"
                                         continue
-                                    fi
-                                    if [[ -z "${value}" && "${nullable}" == "null" ]]; then
-                                        value="null"
                                     fi
                                     if [[ "${constraint}" == "pk" ]]; then
                                         pk_index=$(awk -F: '{if ($3 == "pk") {print NR}}' "${metadata_file}")
                                         allValues=($(awk -F: '{print $'"$pk_index"'}' "${table_name}.txt"))
                                         # num=${#allValues[@]}
-                                    for val in "${allValues[@]}"; do
-                                            if [ "$val" = "$value" ]; then
-                                                echo "Error: ${field_name} must be unique."
-                                                continue 2  # Continue the outer loop (for the next column)
-                                            fi
-                                        done
+                                        for val in "${allValues[@]}"; do
+                                                if [ "$val" = "$value" ]; then
+                                                    echo "Error: ${field_name} must be unique."
+                                                    continue 2  # Continue the outer loop (for the next column)
+                                                fi
+                                            done
                                     fi
                                     break
                                 done
