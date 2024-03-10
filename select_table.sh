@@ -38,7 +38,7 @@ main (){
             *)  if [ -n "$table_name" ]; then
                     while true; do
                     PS3="Choose what to select from table: "
-                    actions=("select all" "select rows by anyfield" "select columns" "Exit")
+                    actions=("select all" "select rows by anyfield" "select by a column" "Exit")
                     fields=($(awk -F: '{print $1}' ".${table_name}-metadata.txt"))
                     select action in "${actions[@]}"
                     do
