@@ -2,6 +2,7 @@
 
 # Function to drop a database
 drop_database() {
+    echo "------------------------------"
     list_databases
     DataBase=($(ls -F ./Databases | grep / | sed 's|[/]||g'))  # Remove trailing slash from each directory name sed 's|[/]||g': Uses sed to remove the trailing slashes from each directory name. The s|[/]||g command replaces each occurrence of the slash / with nothing (| is used as a delimiter, and g means global replacement).
     PS3="Choose db to drop: "
@@ -15,6 +16,7 @@ drop_database() {
               if [ -n "$db_name" ]; 
               then
                 echo "Dropping database: $db_name"
+                echo "-----------------------------"
                 rm -rf "./Databases/$db_name" # Remove the database directory
                 echo "Database '$db_name' dropped successfully."
                 drop_database

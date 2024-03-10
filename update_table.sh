@@ -52,7 +52,10 @@ update_specific_value() {
     fi
 
     #Display column values to the user
+    echo "----------------------------"
     echo "Existing values in the '$column_name' column:"
+    echo "----------------------------"
+
     select old_value in $column_values; 
     do
         if [ -n "$old_value" ]; 
@@ -67,6 +70,7 @@ update_specific_value() {
 
     while true; 
     do
+        echo "----------------------------"
         read -p "Enter the new value: " new_value
          # If the column is a primary key, check if the new value already exists in the column values
         if [[ $pk == 'pk' ]]; then
@@ -95,6 +99,11 @@ update_specific_value() {
             echo "Error: The new value must be an integer."
             continue  # Prompt the user again
         fi
+        if [[ $column_type == "varchar" ]] && ! [[ "$new_value" =~ ^[a-zA-Z0-9[:space:]_.@-]+$ ]]; then
+        echo "Error: The new value must be a string and cannot contain special characters except ., @, _, and -"
+        continue
+        fi
+
 
         # If all validation checks pass, break out of the loop
         break
@@ -107,7 +116,9 @@ update_specific_value() {
 
     # Use awk to update the value at the specified index in the specified column
     awk -i inplace -v indx="$index" -v new_value="$new_value" -v col="$column_numbers" -F':' 'BEGIN{OFS=":"} { for (i=1; i<=NF; i++) { if (i == col) { if (NR == indx) $i = new_value } } print }' "$table_file"
+    echo "***************************"
     echo "Value updated successfully."
+    echo "***************************"
 }
 
 
@@ -123,10 +134,8 @@ list_columns_from_metadata() {
         echo "Metadata file not found: $metadata_file"
         return
     fi
-
     # Use awk to extract column names from the metadata file
     column_names=$(awk -F: '{print $1}' "$metadata_file")
-
     echo "$column_names"
 }
 
@@ -135,10 +144,12 @@ update_table() {
 
     # List column names from metadata
     metadata_columns=$(list_columns_from_metadata "$table_name")
+    echo "----------------------------"
     echo "Columns in $table_name metadata:"
     # echo "$metadata_columns"
     # Get the column number for the specified column name
     PS3="Enter the number corresponding to the column you want to update: "
+    echo "----------------------------"
     select column_name in $metadata_columns; do
         if [ -n "$column_name" ]; then
             break
