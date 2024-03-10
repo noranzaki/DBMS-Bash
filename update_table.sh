@@ -89,6 +89,9 @@ update_specific_value() {
             fi
         fi
 
+        if [[ $constraints == *'null'* ]] && [ -z "$new_value" ]; then
+            break;
+        fi
 
         # If the column is not null, check if the new value is empty
         if [[ $constraints == *'notNull'* ]] && [ -z "$new_value" ]; then
