@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source functions.sh
 cd ./Databases/$db 
 shopt -s extglob
 
@@ -60,8 +60,6 @@ insert_metadata() {
 
                 if [[ "$is_primary_key" == "yes" || "$is_primary_key" == "no" ]];
                 then
-                    echo ""
-
                     break;
                 else
                     echo "Invalid input. Please enter 'yes' or 'no'."
@@ -126,38 +124,25 @@ insert_metadata() {
     if [ "$primary_key_chosen" = false ]; then
         # Display available columns to choose from
         echo "Available columns:"
-        for idx in "${!column_names[@]}"; do
-            echo "$((idx + 1)): ${column_names[idx]}"
-        done
-
         # Prompt user to choose a primary key column
-        while true; do
-            read -rp "Choose a primary key column (Enter column number): " primary_key_column
-
-            # Validate the input
-            if [[ ! "$primary_key_column" =~ ^[0-9]+$ ]]; then
-                echo "Invalid input. Please enter a valid column number."
-                continue
+        select col_option in "${column_names[@]}"; do
+            if [[ -n "$col_option" ]]; then
+                break
+            else
+                echo "Invalid selection. Please choose a valid column."
             fi
-
-            # Check if the chosen column number is within range
-            if (( primary_key_column < 1 || primary_key_column > num_columns )); then
-                echo "Column number is out of range. Please choose a valid column number."
-                continue
-            fi
-
-            # Ensure the chosen column is not nullable
-            chosen_col_name="${column_names[primary_key_column - 1]}"
-            chosen_col_type="${column_types[primary_key_column - 1]}"
-            nullable="notNull"  # Ensure primary key cannot be null
-            pk="pk"
-
-            # Update metadata line for the chosen column
-            metadata_lines[$((primary_key_column - 1))]="${chosen_col_name}:${chosen_col_type}:$pk:$nullable"
-
-            # Exit the loop
-            break
         done
+
+    # Ensure the chosen column is not nullable
+        chosen_col_name="$col_option"
+        chosen_col_type="${column_types[REPLY - 1]}"  # Assuming column_types is indexed by column number
+        nullable="notNull"  # Ensure primary key cannot be null
+        pk="pk"
+
+        # Update metadata line for the chosen column
+        metadata_lines[$((REPLY - 1))]="${chosen_col_name}:${chosen_col_type}:$pk:$nullable"
+
+           
     fi
 
     # Build metadata string
@@ -190,39 +175,15 @@ create_table() {
         # Read table name from user input
         read -rp "Enter table name: " table_name
 
-        # Check if table name is empty
-        if [ -z "$table_name" ]; then
-            echo "Table name cannot be empty."
-            continue
-        fi
-
-        # Check for spaces in table name
-        if [[ "$table_name" =~ [[:space:]] ]]; then
-            echo "Table name cannot contain spaces."
-            continue
-        fi
-
-        # Check for special characters in table name
-        if [[ "$table_name" =~ [^a-zA-Z0-9_] ]]; then
-            echo "Table name cannot contain special characters."
-            continue
-        fi
-
-        # Check if table name starts with a number
-        if [[ "$table_name" =~ ^[0-9] ]]; then
-            echo "Table name cannot start with a number."
-            continue
-        fi
-
-        # Check if table name starts with an underscore
-        if [[ "$table_name" =~ ^_ ]]; then
-            echo "Table name cannot start with an underscore."
-            continue
-        fi
-
         # Check if table already exists
         if [ -f "./$table_name.txt" ]; then
             echo "Table '$table_name' already exists in '$db_name'."
+            continue
+        fi
+
+        if [[ ! $table_name =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]];
+        then
+            echo "Error: Enter a database name that starts with a character and contains no special characters or spaces."
             continue
         fi
 
@@ -244,7 +205,7 @@ create_table() {
 # Main function
 main() {
     db_name=$(basename "$(pwd)")  # Get the name of the current directory as the database name
-    list_tables "$db_name"
+    check_if_tables_exist "$db_name"
     for table in "${tables[@]}"; 
     do
         echo "${table%'.txt'}"  # Remove trailing slash
@@ -254,9 +215,4 @@ main() {
 
 # Call main function
 main
-cd ../..
-# ./connect.sh
-echo "------------------------------"
-echo "Back to Table Menu.."
-echo "------------------------------"
-perform_actions $db
+back_table_menu $db

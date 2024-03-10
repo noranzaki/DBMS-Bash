@@ -1,16 +1,18 @@
 #!/bin/bash
+source functions.sh
 cd ./Databases/$db
 # Function to insert values into a table
 insertIntoTable() {
     db_name=$(basename "$(pwd)")  # Get the name of the current directory as the database name
     echo "******************************"
-    list_tables "$db_name"
+    check_if_tables_exist "$db_name"
     tables=($(ls -F | grep '.txt*' | sed 's/\.txt\*$//' | sed 's/\.txt$//'))  # Remove trailing slash from each directory name
     PS3="Choose a Table to insert into or back to table menu: "
     echo "******************************"
     select table_name in "${tables[@]}" "Back to Table Menu"; do
         case $table_name in
             "Back to Table Menu")
+                cd ../..
                 perform_actions $db_name
                 ;;
 
@@ -69,11 +71,7 @@ insertIntoTable() {
                         echo "${line}" >> "${table_name}.txt"
                         echo "======================================================"
                         echo "congratulations! data is entered successfully."
-                        echo "******************************************************"
-                        echo "Back to table Menu..."
-                        echo "******************************************************"
-                        cd ../..
-                        perform_actions $db
+                        back_table_menu $db
                     else
                         echo "===================================="
                         echo "something went wrong"

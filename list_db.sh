@@ -1,8 +1,7 @@
 #!/bin/bash
-#pwd
-#echo "list db"
+source functions.sh
 echo "------------------------------"
-list_databases
+check_if_databases_exist
 for Databases in "${Databases[@]}"; 
 do
     echo "${Databases%'/'}"  # Remove trailing slash

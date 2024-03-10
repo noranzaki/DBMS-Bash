@@ -1,9 +1,12 @@
 #!/bin/bash
+source functions.sh
 cd ./Databases/$db 
 
 update_specific_value() {
     table_name=$1
     column_name=$2
+
+    pwd
 
     # Read metadata for the specified table name
     metadata_file="./.$table_name-metadata.txt"
@@ -13,7 +16,6 @@ update_specific_value() {
 
     # Extract column metadata
     IFS=' ' read -r column_type pk constraints <<< "$column_metadata"
-    # echo $column_type $pk $constraints
    
     # Check if the metadata file exists
     if [ ! -f "$metadata_file" ]; then
@@ -115,7 +117,9 @@ update_specific_value() {
     fi  
 
     # Use awk to update the value at the specified index in the specified column
-    awk -i inplace -v indx="$index" -v new_value="$new_value" -v col="$column_numbers" -F':' 'BEGIN{OFS=":"} { for (i=1; i<=NF; i++) { if (i == col) { if (NR == indx) $i = new_value } } print }' "$table_file"
+    
+    # awk -i inplace -v indx="$index" -v new_value="$new_value" -v col="$column_numbers" -F':' 'BEGIN{OFS=":"} { for (i=1; i<=NF; i++) { if (i == col) { if (NR == indx) $i = new_value } } print }' "$table_file"
+    awk -v indx="$index" -v new_value="$new_value" -v col="$column_numbers" -F':' 'BEGIN{OFS=":"} { if (NR == indx) $col = new_value; print }' "$table_file" > temp && mv temp "$table_file"
     echo "***************************"
     echo "Value updated successfully."
     echo "***************************"
@@ -166,7 +170,7 @@ update_table() {
 
 choose_table() {
     db_name=$(basename "$(pwd)")  # Get the name of the current directory as the database name
-    list_tables "$db_name"
+    check_if_tables_exist "$db_name"
     tables=($(ls -F | grep '.txt*' | sed 's/\.txt\*$//' | sed 's/\.txt$//'))  # Remove trailing slash from each directory name
     PS3="Choose a Table to update: "
     select table_name in "${tables[@]}" "Back to Table Menu"; do

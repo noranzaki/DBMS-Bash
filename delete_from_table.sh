@@ -1,30 +1,9 @@
 #!/bin/bash
+source functions.sh
 cd ./Databases/$db
 
-display_table_fields() {
-    echo "----------"
-    echo "| Table: |"
-    echo "----------"
-    fields=$(awk -F: '{printf ":%s", $1}' ".${table_name}-metadata.txt")
-    echo "${fields:1}"
-    echo "---------------------------------"
-}
-select_field(){
-    PS3="Select a field: "
-    select field in "${fields[@]}"; do
-        if [ -n "$field" ]; then
-            selected_field="$field"
-            break
-        else
-            echo "Invalid selection. Please try again."
-        fi
-    done
-    echo "You selected: $selected_field"
-    selected_index=$(awk -F: -v name="$selected_field" '$1 == name {print NR}' ".${table_name}-metadata.txt")
-}
-
 main (){
-   list_tables "$db_name"
+    check_if_tables_exist "$db_name"
     tables=($(ls -F | grep '.txt*' | sed 's/\.txt\*$//' | sed 's/\.txt$//'))  # Remove trailing slash from each directory name
     PS3="Choose a Table to Delete from or go back to table menu: "
     echo "******************************"
@@ -70,11 +49,8 @@ main (){
                                     echo "---------------------------------------------"
                                     break;;
                    
-                                3)  echo "******************************************************"
-                                    echo "Back to table Menu..."
-                                    echo "******************************************************"
-                                    cd ../..
-                                    perform_actions $db 
+                                3)  
+                                    back_table_menu $db
                                     break ;;
                                     
                                 *) echo "Invalid option";;
