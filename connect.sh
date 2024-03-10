@@ -37,8 +37,8 @@ perform_actions() {
 
             5) echo "You selected: Delete from table";;
 
-            6) echo "You selected: Update";;
-
+            6) cd ../..
+               source ./update_table.sh; break;;
             7) cd ../..
                source ./listtable.sh; break;;
 

@@ -13,7 +13,7 @@ update_specific_value() {
 
     # Extract column metadata
     IFS=' ' read -r column_type pk constraints <<< "$column_metadata"
-    echo $column_type $pk $constraints
+    # echo $column_type $pk $constraints
    
     # Check if the metadata file exists
     if [ ! -f "$metadata_file" ]; then
@@ -45,6 +45,11 @@ update_specific_value() {
 
     # Read column values from the table file for the specified column
     column_values=$(cut -d: -f"$column_numbers" "$table_file")
+    if [[ -z $column_values ]]
+    then
+        echo "$table_name has no data"
+        return
+    fi
 
     #Display column values to the user
     echo "Existing values in the '$column_name' column:"
@@ -132,8 +137,7 @@ update_table() {
     metadata_columns=$(list_columns_from_metadata "$table_name")
     echo "Columns in $table_name metadata:"
     # echo "$metadata_columns"
-
-    # Prompt user to select a column
+    # Get the column number for the specified column name
     PS3="Enter the number corresponding to the column you want to update: "
     select column_name in $metadata_columns; do
         if [ -n "$column_name" ]; then
@@ -161,17 +165,28 @@ choose_table() {
                 perform_actions $db 
                 ;;
             *)
-                if [ -n "$table_name" ]; then
+                if [ -n "$table_name" ]; 
+                then
                     echo "Updating Table: $table_name"
+                    # Read column values from the table file for the specified column
+                    if [[ ! -s "./$table_name.txt" ]]; then
+                        echo "$table_name has no data. Try inserting data first."
+                        cd ../..
+                        perform_actions "$db"
+                    else
                     update_table $table_name
                     cd ../..
                     perform_actions $db  
+                    fi
                 else
                     echo "Invalid option"
                 fi
                 ;;
         esac
     done
+
+    
+
 }
 
 
