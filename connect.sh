@@ -23,8 +23,6 @@ perform_actions() {
     do
         case $REPLY in
             1) 
-                db=$database
-                export db 
                 cd ../..
                  source ./createtable.sh; break;;  
 
