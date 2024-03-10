@@ -3,6 +3,7 @@ cd ./Databases/$db
 
 drop_table() {
     db_name=$(basename "$(pwd)")  # Get the name of the current directory as the database name
+    echo "-----------------------------"
     list_tables "$db_name"
     tables=($(ls -F | grep '.txt*' | sed 's/\.txt\*$//' | sed 's/\.txt$//'))  # Remove trailing slash from each directory name
     PS3="Choose a Table to drop: "
@@ -15,6 +16,7 @@ drop_table() {
             *)
                 if [ -n "$table_name" ]; then
                     echo "Dropping Table: $table_name"
+                    echo "-----------------------------"
                     rm -f "$table_name.txt" ".$table_name-metadata.txt"  # Remove the table and metadata files
                     echo "Table '$table_name' dropped successfully."
                     drop_table  

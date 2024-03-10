@@ -1,7 +1,5 @@
 #!/bin/bash
 # Function to list available databases
-
-
 list_databases() 
 {
     Databases=($(ls -F ./Databases | grep / )) #to get directories onlyy 
@@ -13,6 +11,8 @@ list_databases()
     else
         echo "Available databases:"
     fi
+    echo "******************************"
+
 }
 export -f list_databases
 if  [[ ! -d ./Databases ]]
