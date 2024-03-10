@@ -43,7 +43,7 @@ insertIntoTable() {
                                     fi
                                     if [[ -z "${value}" && "${nullable}" == "null" ]]; then
                                         value="null"
-                                       
+                                        break   
                                     fi
                                     if [[ "${field_type}" == "int" && ! "${value}" =~ ^[0-9]+$ ]]; then
                                         echo "Error: ${field_name} must be an integer."
